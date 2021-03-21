@@ -3,7 +3,10 @@ package com.codegym.service.appuser;
 
 import com.codegym.model.AppUser;
 import com.codegym.repository.AppUserRepository;
+import com.codegym.service.IService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +19,7 @@ import java.util.List;
 
 
 @Service
-public class AppUserService implements IAppUserService, UserDetailsService {
+public class AppUserService implements UserDetailsService , IAppUserService {
 
     @Autowired
     private AppUserRepository appUserRepository;
@@ -38,4 +41,10 @@ public class AppUserService implements IAppUserService, UserDetailsService {
         );
         return userDetails;
     }
+
+    @Override
+    public AppUser save(AppUser appUser) {
+        return appUserRepository.save(appUser);
+    }
+
 }

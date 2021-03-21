@@ -45,4 +45,10 @@ public class CategoryController {
         modelAndView.addObject("mess", "Thêm mới thành công danh mục" + category.getName());
         return modelAndView;
     }
+    @PostMapping("/noright")
+    public ModelAndView p403(){
+        ModelAndView modelAndView =  new ModelAndView("noright");
+        return modelAndView;
+    }
+
 }

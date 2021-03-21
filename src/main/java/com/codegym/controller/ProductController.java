@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 
-
 @Controller
 @RequestMapping("/products")
 public class ProductController {
@@ -28,18 +27,18 @@ public class ProductController {
         return categoryService.findALl();
     }
 
-    @GetMapping("")
-    public ModelAndView getAll(@PageableDefault(size = 10) Pageable pageable) {
+    @GetMapping("/admin")
+    public ModelAndView admin(@PageableDefault(size = 10) Pageable pageable) {
         Page<Product> products = productService.findALl(pageable);
-        ModelAndView modelAndView = new ModelAndView("product/list");
+        ModelAndView modelAndView = new ModelAndView("product/admin");
         modelAndView.addObject("products", products);
 //        modelAndView.addObject("categories", categoryService.findAll());
         return modelAndView;
     }
-    @GetMapping("/shop")
-    public ModelAndView getShop() {
+    @GetMapping("/user")
+    public ModelAndView user() {
         List<Product> products = productService.findALl();
-        ModelAndView modelAndView = new ModelAndView("product/shop");
+        ModelAndView modelAndView = new ModelAndView("product/user");
         modelAndView.addObject("products", products);
 //        modelAndView.addObject("categories", categoryService.findAll());
         return modelAndView;
@@ -63,7 +62,7 @@ public class ProductController {
     }
     @ExceptionHandler(NotFoundException.class)
     public ModelAndView showNotFound() {
-        return new ModelAndView("error-404");
+        return new ModelAndView("error");
     }
 
     @GetMapping("/edit/{id}")
@@ -78,12 +77,12 @@ public class ProductController {
     public ModelAndView edit(@PathVariable Long id, @ModelAttribute Product product) {
         product.setId(id);
         productService.save(product);
-        return new ModelAndView("redirect:/products");
+        return new ModelAndView("redirect:/products/admin");
     }
 
     @GetMapping("/delete/{id}")
     public ModelAndView delete(@PathVariable long id) {
-        ModelAndView modelAndView = new ModelAndView("redirect:/products");
+        ModelAndView modelAndView = new ModelAndView("redirect:/products/admin");
         productService.remove(id);
         return modelAndView;
     }
@@ -95,42 +94,48 @@ public class ProductController {
 
 
     @PostMapping("/search")
-    public ModelAndView searchProductByName(@RequestParam String name,Pageable pageable) {
-        name = "%" + name + "%";
-        Page<Product> products = productService.findByProductName(name,pageable);
-        if (products.getSize() == 0) return new ModelAndView("error-404");
-        ModelAndView modelAndView=new ModelAndView("product/list");
+    public ModelAndView searchProductByName(@RequestParam String searchText, @PageableDefault (size = 5)Pageable pageable) {
+        searchText = "%" + searchText + "%";
+        Page<Product> products = productService.findByProductName(searchText,pageable);
+        if (products.getSize() == 0) return new ModelAndView("error");
+        ModelAndView modelAndView=new ModelAndView("product/admin");
         modelAndView.addObject("category",new Category());
         modelAndView.addObject("products",products);
         return modelAndView;
     }
 
     @PostMapping("/searchCategory")
-    public ModelAndView searchProductByCategory(@RequestParam Long id, @PageableDefault (size = 3) Pageable pageable) {
+    public ModelAndView searchProductByCategory(@RequestParam Long id, @PageableDefault (size = 10) Pageable pageable) {
         Page<Product> products = productService.findByCategoryName(id, pageable);
-        if (products.getSize() == 0) return new ModelAndView("error-404");
-        else return new ModelAndView("product/list", "products", products);
+        if (products.getSize() == 0) return new ModelAndView("error");
+        else return new ModelAndView("product/admin", "products", products);
     }
 
 
     @GetMapping("/top5price")
     public ModelAndView top5Price(){
-        ModelAndView modelAndView = new ModelAndView("product/list");
+        ModelAndView modelAndView = new ModelAndView("product/admin");
         modelAndView.addObject("products",productService.top5Price());
         return modelAndView;
     }
     @GetMapping("/top5newProduct")
     public ModelAndView top5newProduct(){
-        ModelAndView modelAndView = new ModelAndView("product/list");
+        ModelAndView modelAndView = new ModelAndView("product/admin");
         modelAndView.addObject("products",productService.top5ProductNew());
         return modelAndView;
     }
     @GetMapping("/totalPrice")
     public ModelAndView sumPrice() {
-        ModelAndView modelAndView = new ModelAndView("product/list");
+        ModelAndView modelAndView = new ModelAndView("product/admin");
         modelAndView.addObject("totalPrice", productService.totalPrice());
         modelAndView.addObject("products", productService.findALl());
         return modelAndView;
+    }
+    @GetMapping("/searchCategory")
+    public ModelAndView searchProductByCategory2 (@RequestParam Long id, @PageableDefault (size = 10) Pageable pageable) {
+        Page<Product> products = productService.findByCategoryName(id, pageable);
+        if (products.getSize() == 0) return new ModelAndView("error");
+        else return new ModelAndView("product/admin", "products", products);
     }
 
 }
